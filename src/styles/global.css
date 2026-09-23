@@ -1,0 +1,242 @@
+/* ============================================
+   AURUM AUTO DETAILING — Design System
+   Palette pulled from logo: jet black, gunmetal
+   chrome, racing red. Motorsport-industrial tone.
+   ============================================ */
+
+:root {
+  --black: #0a0a0a;
+  --black-2: #131315;
+  --black-3: #1c1c1f;
+  --charcoal: #232327;
+
+  --chrome-100: #f5f6f7;
+  --chrome-200: #e2e4e7;
+  --chrome-300: #c7cbd1;
+  --chrome-400: #9a9fa6;
+  --chrome-500: #6f747b;
+  --chrome-600: #4b4f55;
+
+  --red-700: #7f1113;
+  --red-600: #9c161a;
+  --red-500: #c11e22;
+  --red-400: #dc2626;
+  --red-300: #ef4444;
+  --red-glow: rgba(193, 30, 34, 0.45);
+
+  --white: #ffffff;
+  --off-white: #f7f7f8;
+
+  --success: #1f9d55;
+
+  --bg: var(--black);
+  --bg-elevated: var(--black-2);
+  --text-primary: var(--off-white);
+  --text-muted: var(--chrome-400);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  --font-display: 'Rajdhani', 'Oswald', sans-serif;
+  --font-accent: 'Oswald', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --container-w: 1240px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --nav-h: 78px;
+  --nav-h-mobile: 64px;
+
+  --shadow-card: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+  --shadow-red: 0 12px 32px -10px var(--red-glow);
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* { box-sizing: border-box; }
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h) + 16px);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.08;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+img { max-width: 100%; display: block; }
+ul { margin: 0; padding: 0; list-style: none; }
+
+::selection { background: var(--red-500); color: var(--white); }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--black); }
+::-webkit-scrollbar-thumb { background: var(--chrome-600); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--red-600); }
+
+.container {
+  width: 100%;
+  max-width: var(--container-w);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+section { position: relative; }
+
+.section-pad { padding: 110px 0; }
+@media (max-width: 900px) { .section-pad { padding: 76px 0; } }
+@media (max-width: 600px) { .section-pad { padding: 60px 0; } }
+
+.section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-accent);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--red-400);
+  margin-bottom: 16px;
+}
+.section-eyebrow::before {
+  content: '';
+  width: 26px;
+  height: 2px;
+  background: var(--red-500);
+  display: inline-block;
+}
+
+.section-title {
+  font-size: clamp(32px, 4.4vw, 48px);
+  color: var(--white);
+  margin-bottom: 18px;
+}
+.section-title em {
+  font-style: normal;
+  color: var(--red-400);
+}
+.section-sub {
+  color: var(--text-muted);
+  font-size: 17px;
+  max-width: 560px;
+  line-height: 1.7;
+}
+
+.chrome-text {
+  background: linear-gradient(180deg, #fff 0%, #cfd3d8 45%, #8c9198 55%, #e7e9ec 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  font-family: var(--font-accent);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 16px 30px;
+  border-radius: var(--radius-sm);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s var(--ease), border-color 0.25s var(--ease), color 0.25s var(--ease);
+  white-space: nowrap;
+}
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--red-500), var(--red-700));
+  color: var(--white);
+  box-shadow: var(--shadow-red);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 36px -10px var(--red-glow); }
+
+.btn-chrome {
+  background: linear-gradient(180deg, var(--chrome-200), var(--chrome-500));
+  color: var(--black);
+  box-shadow: 0 10px 24px -10px rgba(0,0,0,0.5);
+}
+.btn-chrome:hover { transform: translateY(-2px); filter: brightness(1.06); }
+
+.btn-outline {
+  background: none;
+  border: 1.5px solid var(--border-strong);
+  color: var(--white);
+}
+.btn-outline:hover { border-color: var(--red-500); color: var(--red-300); }
+
+.btn-ghost-dark {
+  background: rgba(255,255,255,0.06);
+  color: var(--white);
+  border: 1px solid var(--border-subtle);
+}
+.btn-ghost-dark:hover { background: rgba(255,255,255,0.1); }
+
+.btn-block { width: 100%; }
+.btn-lg { padding: 18px 34px; font-size: 16px; }
+.btn-sm { padding: 11px 20px; font-size: 13px; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.08s; }
+.reveal-delay-2 { transition-delay: 0.16s; }
+.reveal-delay-3 { transition-delay: 0.24s; }
+.reveal-delay-4 { transition-delay: 0.32s; }
+
+.diagonal-edge-r { clip-path: polygon(6% 0, 100% 0, 100% 100%, 0% 100%); }
+.diagonal-edge-l { clip-path: polygon(0 0, 100% 0, 94% 100%, 0 100%); }
+
+.toast-custom {
+  font-family: var(--font-body) !important;
+  background: var(--black-2) !important;
+  color: var(--white) !important;
+  border: 1px solid var(--border-subtle) !important;
+}
+
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--red-400);
+  outline-offset: 2px;
+}
+
+.spinner {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(255,255,255,0.3);
+  border-top-color: var(--white);
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+  .container { padding: 0 18px; }
+}
