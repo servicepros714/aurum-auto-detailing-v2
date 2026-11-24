@@ -6,7 +6,8 @@
 .checkout-page .container.checkout-container { max-width: 520px; }
 
 .checkout-back-link {
-  display: inline-flex;
+  display: flex;
+  width: fit-content;
   align-items: center;
   gap: 4px;
   font-family: var(--font-accent);
