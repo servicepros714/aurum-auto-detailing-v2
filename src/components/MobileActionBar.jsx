@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Phone, CalendarCheck } from 'lucide-react'
+import { BUSINESS } from '../data/business'
 import '../styles/mobile-action-bar.css'
 
-const PHONE_TEL = 'tel:+17149424780'
-const PHONE_DISPLAY = '(714) 942-4780'
+const PHONE_TEL = BUSINESS.phoneHref
+const PHONE_DISPLAY = BUSINESS.phone
 
 // Sticky bottom action bar shown only on mobile, only after the visitor
 // scrolls past the hero. Hidden entirely on the booking flow pages, which

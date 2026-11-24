@@ -110,3 +110,16 @@
 @media (max-width: 480px) {
   .checkout-page { padding: 24px 0 60px; }
 }
+
+/* Express Checkout (Apple Pay / Google Pay / Link): hidden until Stripe reports a wallet. */
+.stripe-express { display: none; margin-bottom: 4px; }
+.stripe-express.is-ready { display: block; }
+.stripe-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 14px 0 16px;
+  font-family: var(--font-accent);
+  font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--chrome-500);
+}
+.stripe-divider::before, .stripe-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-strong); }
+.checkout-pay-later:disabled { opacity: .6; cursor: wait; }

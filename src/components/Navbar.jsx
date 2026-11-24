@@ -1,18 +1,20 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Menu, X, Phone, CalendarCheck } from 'lucide-react'
+import { BUSINESS, REVIEWS } from '../data/business'
 import '../styles/navbar.css'
 
 const LINKS = [
   { to: '/#services', label: 'Services' },
   { to: '/#about', label: 'About' },
   { to: '/#gallery', label: 'Gallery' },
-  { to: '/#reviews', label: 'Reviews' },
-  { to: '/#contact', label: 'Contact' },
+  ...(REVIEWS.length ? [{ to: '/#reviews', label: 'Reviews' }] : []),
+  { to: '/#faq', label: 'FAQ' },
+  { to: '/#contact', label: 'Service Area' },
 ]
 
-const PHONE_DISPLAY = '(714) 942-4780'
-const PHONE_TEL = 'tel:+17149424780'
+const PHONE_DISPLAY = BUSINESS.phone
+const PHONE_TEL = BUSINESS.phoneHref
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)

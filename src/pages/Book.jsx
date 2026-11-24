@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Check } from 'lucide-react'
 import toast from 'react-hot-toast'
 import {
@@ -9,7 +9,7 @@ import {
 import BookingHeader from '../components/BookingHeader'
 import BookingActionBar from '../components/BookingActionBar'
 import { SERVICES, ADD_ONS, buildOrder } from '../data/services'
-import { generateSlots, getPacificDateString, getMinimumLeadTimeValue } from '../lib/slots'
+import { generateSlots, getPacificDateString, getMinimumLeadMinutes } from '../lib/slots'
 import { getAvailability, createBooking } from '../lib/api'
 import '../styles/booking.css'
 
@@ -28,6 +28,7 @@ function formatPhoneInput(raw) {
 
 export default function Book() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [step, setStep] = useState(1)
 
   const [serviceId, setServiceId] = useState(null)
@@ -46,6 +47,13 @@ export default function Book() {
 
   const order = useMemo(() => buildOrder(serviceId, hasExterior), [serviceId, hasExterior])
   const selectedService = useMemo(() => SERVICES.find((s) => s.id === serviceId) || null, [serviceId])
+
+  // Landing pages link to /book?package=basic|premium to preselect a package.
+  useEffect(() => {
+    const pkg = searchParams.get('package')
+    if (SERVICES.some((s) => s.id === pkg)) setServiceId(pkg)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -118,20 +126,20 @@ export default function Book() {
       const payload = {
         date: format(selectedDate, 'yyyy-MM-dd'),
         time: selectedTime,
-        service: order.label,
+        serviceId: order.service.id,
+        exteriorAddOn: Boolean(order.addOn),
         name: form.fullName.trim(),
         phone: form.phone.trim(),
         email: form.email.trim(),
         vehicle: form.vehicle.trim(),
         address: form.address.trim(),
-        source: 'aurum',
       }
       const res = await createBooking(payload)
       navigate('/checkout', {
         state: {
           bookingId: res?.id,
-          label: order.label,
-          total: order.total,
+          label: res?.service || order.label,
+          total: res?.total ?? order.total,
           date: payload.date,
           time: selectedTime,
           name: payload.name,
@@ -159,10 +167,10 @@ export default function Book() {
 
   const slots = useMemo(() => generateSlots(), [])
   const isSelectedDateToday = selectedDate ? isSameDay(selectedDate, today) : false
-  const minLeadTimeValue = useMemo(() => getMinimumLeadTimeValue(), [])
+  const minLeadMinutes = useMemo(() => getMinimumLeadMinutes(), [step])
   const availableSlots = slots.filter((s) => {
     if (bookedSlots.includes(s.value)) return false
-    if (isSelectedDateToday && s.value < minLeadTimeValue) return false
+    if (isSelectedDateToday && s.minutes < minLeadMinutes) return false
     return true
   })
 
@@ -239,7 +247,7 @@ export default function Book() {
             <>
               <div className="booking-card-head">
                 <h1>Pick a date</h1>
-                <p>We're open seven days a week, 7:00 AM – 7:00 PM.</p>
+                <p>We come to you every day, with start times from 8:00 AM to 5:00 PM.</p>
               </div>
               <div className="booking-calendar">
                 <div className="booking-calendar-head">

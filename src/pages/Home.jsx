@@ -6,6 +6,7 @@ import Gallery from '../components/Gallery'
 import Reviews from '../components/Reviews'
 import CTABanner from '../components/CTABanner'
 import MapSection from '../components/MapSection'
+import Faq from '../components/Faq'
 import useReveal from '../lib/useReveal'
 
 export default function Home() {
@@ -27,8 +28,9 @@ export default function Home() {
       <About />
       <Gallery />
       <Reviews />
-      <CTABanner />
+      <Faq />
       <MapSection />
+      <CTABanner />
     </>
   )
 }

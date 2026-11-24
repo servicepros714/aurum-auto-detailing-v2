@@ -4,11 +4,14 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import MobileActionBar from './components/MobileActionBar'
 import ScrollToTop from './components/ScrollToTop'
+import Seo from './components/Seo'
 import Home from './pages/Home'
 import Book from './pages/Book'
 import Checkout from './pages/Checkout'
 import Confirmation from './pages/Confirmation'
 import NotFound from './pages/NotFound'
+import Landing from './pages/Landing'
+import { LANDING_PAGES } from './lib/pages'
 
 const HIDE_CHROME_ON = ['/book', '/checkout', '/confirmation']
 
@@ -19,6 +22,7 @@ export default function App() {
   return (
     <>
       <ScrollToTop />
+      <Seo />
       <Toaster
         position="top-center"
         toastOptions={{ className: 'toast-custom', duration: 3500 }}
@@ -28,6 +32,9 @@ export default function App() {
 
       <Routes>
         <Route path="/" element={<Home />} />
+        {LANDING_PAGES.map((page) => (
+          <Route key={page.path} path={page.path} element={<Landing page={page} />} />
+        ))}
         <Route path="/book" element={<Book />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/confirmation" element={<Confirmation />} />

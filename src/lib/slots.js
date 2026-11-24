@@ -1,25 +1,19 @@
-// Generates the fixed daily slot grid: 7:00 AM – 7:00 PM, every 30 minutes,
-// open all seven days a week. Booked slots (and same-day slots inside the
-// minimum lead time) are filtered out by the caller.
+// The daily start-time grid: 8:00 AM – 5:00 PM, every 30 minutes, every day.
+// Must match TIME_SLOTS in worker/worker.js. The value sent to the Worker is the
+// label itself ("8:00 AM"), the same format the shared bookings table uses.
+// Booked slots (and same-day slots inside the 2-hour lead time) come back from
+// /api/availability as `booked` and are filtered out by the caller.
+
+export const LEAD_MINUTES = 120
 
 export function generateSlots() {
   const slots = []
-  let hour = 7
-  let minute = 0
-  while (hour < 19 || (hour === 19 && minute === 0)) {
-    const h24 = hour
-    const displayHour = h24 % 12 === 0 ? 12 : h24 % 12
-    const period = h24 < 12 ? 'AM' : 'PM'
-    const label = `${displayHour}:${minute === 0 ? '00' : minute} ${period}`
-    const value = `${String(h24).padStart(2, '0')}:${minute === 0 ? '00' : minute}`
-    slots.push({ value, label })
-
-    if (hour === 19 && minute === 0) break
-    minute += 30
-    if (minute === 60) {
-      minute = 0
-      hour += 1
-    }
+  for (let mins = 8 * 60; mins <= 17 * 60; mins += 30) {
+    const h = Math.floor(mins / 60)
+    const m = mins % 60
+    const hour12 = h % 12 === 0 ? 12 : h % 12
+    const label = `${hour12}:${m === 0 ? '00' : m} ${h >= 12 ? 'PM' : 'AM'}`
+    slots.push({ value: label, label, minutes: mins })
   }
   return slots
 }
@@ -35,10 +29,9 @@ export function getPacificDateString(date = new Date()) {
   }).format(date)
 }
 
-// The earliest bookable "HH:MM" slot value for TODAY in Pacific time —
-// current Pacific time plus a 4-hour lead time, rounded up to the next
-// 30-minute slot. Only relevant when the selected date is today.
-export function getMinimumLeadTimeValue() {
+// Minutes since midnight of the earliest bookable start TODAY in Pacific time
+// (now + the 2-hour lead time). Only relevant when the selected date is today.
+export function getMinimumLeadMinutes() {
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/Los_Angeles',
     hourCycle: 'h23',
@@ -48,12 +41,5 @@ export function getMinimumLeadTimeValue() {
 
   const hour = Number(parts.find((p) => p.type === 'hour').value)
   const minute = Number(parts.find((p) => p.type === 'minute').value)
-
-  let totalMinutes = hour * 60 + minute + 4 * 60
-  const remainder = totalMinutes % 30
-  if (remainder !== 0) totalMinutes += 30 - remainder
-
-  const h = Math.floor(totalMinutes / 60)
-  const m = totalMinutes % 60
-  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+  return hour * 60 + minute + LEAD_MINUTES
 }

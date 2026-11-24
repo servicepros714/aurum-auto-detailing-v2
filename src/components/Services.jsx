@@ -1,24 +1,29 @@
 import { Link } from 'react-router-dom'
 import { Check, ArrowUpRight } from 'lucide-react'
 import { SERVICES, ADD_ONS } from '../data/services'
+import { ServiceChips } from './ServiceLinks'
 import '../styles/services.css'
 
 const CARDS = [...SERVICES, ...ADD_ONS]
 
-export default function Services() {
+// Package cards. The home page shows links to the service pages under the cards;
+// landing pages reuse the section with their own heading and no links.
+export default function Services({
+  eyebrow = 'What We Offer',
+  title = <>Mobile detailing packages for <em>Tustin driveways</em></>,
+  showLinks = true,
+}) {
   return (
     <section id="services" className="services-section section-pad">
       <div className="container">
         <div className="services-head reveal">
           <div>
-            <div className="section-eyebrow">What We Offer</div>
-            <h2 className="section-title">
-              Detailing packages built for <em>real Orange County driveways</em>
-            </h2>
+            <div className="section-eyebrow">{eyebrow}</div>
+            <h2 className="section-title">{title}</h2>
           </div>
           <p className="section-sub">
-            Every visit is a mobile appointment — our team arrives with water,
-            power, and everything needed to bring the shine to you.
+            Every visit is a mobile appointment. We bring our own water and power,
+            and the price is the same for a compact car or a three-row SUV.
           </p>
         </div>
 
@@ -34,7 +39,7 @@ export default function Services() {
               <p className="service-card-tagline">{card.tagline}</p>
               <div className="service-card-price">
                 <span>{card.id === 'exterior' ? '+' : ''}${card.price}</span>
-                {card.id !== 'exterior' && <small>starting at</small>}
+                <small>{card.id === 'exterior' ? 'add-on to either detail' : `about ${card.duration}`}</small>
               </div>
               <ul className="service-card-features">
                 {card.features.map((f) => (
@@ -47,6 +52,13 @@ export default function Services() {
             </article>
           ))}
         </div>
+
+        {showLinks && (
+          <div className="services-links reveal">
+            <span>Compare in detail:</span>
+            <ServiceChips />
+          </div>
+        )}
 
         <div className="services-cta-wrap reveal">
           <Link to="/book" className="btn btn-primary btn-lg">

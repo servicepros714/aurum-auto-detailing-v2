@@ -1,5 +1,5 @@
 // Shared service catalog. Prices are in whole US dollars.
-// IMPORTANT: this list must stay in sync with worker/index.js SERVICES map —
+// IMPORTANT: this list must stay in sync with worker/worker.js SERVICES map —
 // the Worker recalculates the total server-side before creating the
 // Stripe PaymentIntent so the browser can never spoof the amount.
 
@@ -8,6 +8,7 @@ export const SERVICES = [
     id: 'basic',
     name: 'Basic Detail',
     price: 150,
+    duration: '1.5–2 hours',
     tagline: 'Deep interior refresh',
     description:
       'A thorough interior refresh that clears out debris, wipes every surface, and restores your floor mats — the essential detail for a car that sees daily life.',
@@ -21,6 +22,7 @@ export const SERVICES = [
     id: 'premium',
     name: 'Premium Detail',
     price: 200,
+    duration: '3–4 hours',
     tagline: 'Full interior transformation',
     popular: true,
     description:

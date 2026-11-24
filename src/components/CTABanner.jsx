@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight, Phone } from 'lucide-react'
+import { BUSINESS } from '../data/business'
 import '../styles/cta-banner.css'
 
 export default function CTABanner() {
@@ -15,8 +16,8 @@ export default function CTABanner() {
           <Link to="/book" className="btn btn-chrome btn-lg">
             Book Online <ArrowRight size={17} />
           </Link>
-          <a href="tel:+17149424780" className="btn btn-outline btn-lg">
-            <Phone size={16} /> (714) 942-4780
+          <a href={BUSINESS.phoneHref} className="btn btn-outline btn-lg">
+            <Phone size={16} /> {BUSINESS.phone}
           </a>
         </div>
       </div>

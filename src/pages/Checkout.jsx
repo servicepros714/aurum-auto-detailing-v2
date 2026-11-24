@@ -4,7 +4,8 @@ import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 import { ChevronLeft, Tag, ShieldCheck, Loader2, CheckCircle2 } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { createPaymentIntent, confirmPayment, validateCoupon } from '../lib/api'
+import { createPaymentIntent, markPaid, confirmPayLater, validateCoupon } from '../lib/api'
+import { formatBookingDate, saveCheckout } from '../lib/checkout'
 import StripePaymentForm from '../components/StripePaymentForm'
 import '../styles/checkout.css'
 
@@ -22,6 +23,7 @@ export default function Checkout() {
   const [clientSecret, setClientSecret] = useState(null)
   const [amount, setAmount] = useState(state?.total || 0)
   const [loadingIntent, setLoadingIntent] = useState(true)
+  const [confirming, setConfirming] = useState(false)
 
   useEffect(() => {
     if (!state?.bookingId) {
@@ -39,6 +41,8 @@ export default function Checkout() {
       .then((res) => {
         setClientSecret(res.clientSecret)
         setAmount(res.amount)
+        // Kept for the rare payment method that leaves the site and comes back to /confirmation.
+        saveCheckout({ ...state, total: res.amount })
       })
       .catch((err) => toast.error(err.message || 'Could not start checkout.'))
       .finally(() => setLoadingIntent(false))
@@ -65,21 +69,34 @@ export default function Checkout() {
     }
   }
 
-  async function handlePaySuccess() {
+  // Stripe accepted the payment. The Worker verifies it with Stripe, marks the booking
+  // Paid and sends the confirmation email. The money is taken either way, so go on to
+  // the confirmation page even if that call fails (the Stripe webhook can catch up).
+  async function handlePaySuccess(paymentIntent) {
     try {
-      await confirmPayment({ bookingId: state.bookingId })
+      await markPaid(state.bookingId, paymentIntent.id)
     } catch (_) {
-      // booking still exists even if this confirmation call fails — non-blocking
+      // non-blocking
     }
+    saveCheckout(null)
     navigate('/confirmation', {
       state: { ...state, total: amount, paid: true },
     })
   }
 
-  function payLater() {
-    navigate('/confirmation', {
-      state: { ...state, paid: false },
-    })
+  async function payLater() {
+    if (confirming) return
+    setConfirming(true)
+    try {
+      const res = await confirmPayLater(state.bookingId, state.email)
+      saveCheckout(null)
+      navigate('/confirmation', {
+        state: { ...state, total: res?.total ?? state.total, paid: false },
+      })
+    } catch (err) {
+      toast.error(err.message || 'Could not confirm your booking. Please call us.')
+      setConfirming(false)
+    }
   }
 
   return (
@@ -105,7 +122,7 @@ export default function Checkout() {
             <strong>${amount}</strong>
           </div>
           <div className="checkout-summary-meta">
-            {state.date} · {state.time && formatTimeLabel(state.time)}
+            {formatBookingDate(state.date)} · {state.time}
           </div>
         </div>
 
@@ -131,8 +148,13 @@ export default function Checkout() {
           {loadingIntent || !clientSecret ? (
             <div className="checkout-loading"><span className="spinner" /></div>
           ) : (
-            <Elements stripe={stripePromise} options={{ clientSecret, appearance: stripeAppearance }}>
-              <StripePaymentForm onSuccess={handlePaySuccess} payLabel={`Pay $${amount} Securely`} />
+            <Elements key={clientSecret} stripe={stripePromise} options={{ clientSecret, appearance: stripeAppearance }}>
+              <StripePaymentForm
+                onSuccess={handlePaySuccess}
+                payLabel={`Pay $${amount} Securely`}
+                name={state.name}
+                email={state.email}
+              />
             </Elements>
           )}
           <div className="checkout-secure-note">
@@ -140,19 +162,12 @@ export default function Checkout() {
           </div>
         </div>
 
-        <button type="button" className="checkout-pay-later" onClick={payLater}>
-          I'll pay later, at my appointment
+        <button type="button" className="checkout-pay-later" onClick={payLater} disabled={confirming}>
+          {confirming ? 'Confirming…' : "I'll pay later, at my appointment"}
         </button>
       </div>
     </div>
   )
-}
-
-function formatTimeLabel(value) {
-  const [h, m] = value.split(':').map(Number)
-  const period = h < 12 ? 'AM' : 'PM'
-  const displayHour = h % 12 === 0 ? 12 : h % 12
-  return `${displayHour}:${String(m).padStart(2, '0')} ${period}`
 }
 
 const stripeAppearance = {

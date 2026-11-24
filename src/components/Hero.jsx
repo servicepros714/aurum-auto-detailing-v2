@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
-import { ShieldCheck, Star, MapPin, ArrowRight } from 'lucide-react'
+import { ShieldCheck, Clock, MapPin, ArrowRight } from 'lucide-react'
+import { BUSINESS } from '../data/business'
 import '../styles/hero.css'
 
 const STATS = [
-  { value: '5.0', label: 'Average Rating', icon: Star },
+  { value: '8–5', label: 'Open Every Day', icon: Clock },
   { value: '100%', label: 'Satisfaction Guaranteed', icon: ShieldCheck },
-  { value: 'OC', label: 'We Come To You', icon: MapPin },
+  { value: 'Tustin', label: 'We Come To You', icon: MapPin },
 ]
 
 export default function Hero() {
@@ -13,21 +14,22 @@ export default function Hero() {
     <section className="hero">
       <div className="hero-left">
         <div className="hero-left-content">
-          <div className="section-eyebrow">Mobile Detailing · Tustin, CA</div>
-          <h1 className="hero-title">
+          <h1 className="section-eyebrow">Mobile Car Detailing in Tustin, CA</h1>
+          <p className="hero-title">
             Showroom shine, <span className="chrome-text">delivered</span> to your <em>driveway</em>.
-          </h1>
+          </p>
           <p className="hero-sub">
-            Aurum Auto Detailing brings professional-grade interior and exterior
-            detailing straight to your home or office across Orange County — no
-            drop-off, no waiting room, just a car that looks brand new.
+            Aurum Auto Detailing brings interior detailing, plus an optional
+            exterior hand wash, to your home or office in Tustin and nearby
+            cities. We bring our own water and power, so there is no drop-off
+            and nothing to set up.
           </p>
           <div className="hero-cta-row">
             <Link to="/book" className="btn btn-primary btn-lg">
               Book Your Detail <ArrowRight size={17} />
             </Link>
-            <a href="tel:+17149424780" className="btn btn-outline btn-lg">
-              (714) 942-4780
+            <a href={BUSINESS.phoneHref} className="btn btn-outline btn-lg">
+              {BUSINESS.phone}
             </a>
           </div>
           <div className="hero-tags">

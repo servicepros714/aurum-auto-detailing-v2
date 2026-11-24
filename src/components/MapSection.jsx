@@ -1,10 +1,12 @@
-import { MapPin, Clock, Mail, Phone } from 'lucide-react'
+import { MapPin, Clock, Phone } from 'lucide-react'
+import { BUSINESS } from '../data/business'
+import { AreaChips } from './ServiceLinks'
 import '../styles/map-section.css'
 
 const INFO = [
-  { icon: MapPin, label: 'Service Area', value: 'Tustin, CA & Orange County' },
-  { icon: Clock, label: 'Hours', value: 'Mon–Sun, by appointment' },
-  { icon: Phone, label: 'Call or Text', value: '(714) 942-4780' },
+  { icon: MapPin, label: 'Service Area', value: 'Tustin, North Tustin, Irvine, Santa Ana & Orange' },
+  { icon: Clock, label: 'Hours', value: BUSINESS.hours },
+  { icon: Phone, label: 'Call', value: BUSINESS.phone, href: BUSINESS.phoneHref },
 ]
 
 export default function MapSection() {
@@ -12,20 +14,23 @@ export default function MapSection() {
     <section id="contact" className="map-section section-pad">
       <div className="container map-grid">
         <div className="map-info reveal">
-          <div className="section-eyebrow">Find Us</div>
+          <div className="section-eyebrow">Service Area</div>
           <h2 className="section-title">Mobile detailing, <em>based in Tustin</em></h2>
-          <p className="section-sub" style={{ marginBottom: 32 }}>
-            We travel throughout Orange County — from Tustin and Irvine to
-            Santa Ana, Orange, and beyond. Tell us your address at booking
-            and we'll confirm the visit.
+          <p className="section-sub" style={{ marginBottom: 20 }}>
+            We come to homes and workplaces across Tustin, including{' '}
+            {BUSINESS.areas.slice(0, 4).join(', ')}, and to these nearby cities
+            at the same prices:
           </p>
+          <div style={{ marginBottom: 32 }}>
+            <AreaChips />
+          </div>
           <div className="map-info-list">
-            {INFO.map(({ icon: Icon, label, value }) => (
+            {INFO.map(({ icon: Icon, label, value, href }) => (
               <div className="map-info-item" key={label}>
                 <div className="map-info-icon"><Icon size={18} strokeWidth={2.2} /></div>
                 <div>
                   <span>{label}</span>
-                  <strong>{value}</strong>
+                  <strong>{href ? <a href={href}>{value}</a> : value}</strong>
                 </div>
               </div>
             ))}

@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://aurumautodetailing.com/sitemap.xml
+
+Sitemap: https://aurumautodetailing.site/sitemap.xml

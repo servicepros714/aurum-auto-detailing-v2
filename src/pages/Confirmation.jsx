@@ -1,56 +1,76 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation, Link, useNavigate } from 'react-router-dom'
 import { CheckCircle2, Calendar, Clock, MapPin, Phone } from 'lucide-react'
+import { markPaid } from '../lib/api'
+import { formatBookingDate, loadCheckout, saveCheckout } from '../lib/checkout'
+import { BUSINESS } from '../data/business'
 import '../styles/confirmation.css'
 
 export default function Confirmation() {
-  const { state } = useLocation()
+  const location = useLocation()
   const navigate = useNavigate()
+  const [booking, setBooking] = useState(location.state?.bookingId ? location.state : null)
+  const [checked, setChecked] = useState(Boolean(location.state?.bookingId))
 
+  // Normal path: Checkout navigates here with the booking in router state.
+  // Fallback: a payment method that left the site returns with ?payment_intent=...&redirect_status=...
   useEffect(() => {
-    if (!state?.bookingId) navigate('/', { replace: true })
-  }, [state, navigate])
+    if (location.state?.bookingId) return
+    const params = new URLSearchParams(location.search)
+    const piId = params.get('payment_intent')
+    const saved = loadCheckout()
+    if (piId && params.get('redirect_status') === 'succeeded' && saved?.bookingId) {
+      markPaid(saved.bookingId, piId).catch(() => {}).finally(() => {
+        saveCheckout(null)
+        setBooking({ ...saved, paid: true })
+        setChecked(true)
+      })
+      return
+    }
+    navigate('/', { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  if (!state?.bookingId) return null
+  if (!checked || !booking) return null
 
   return (
     <div className="confirmation-page">
       <div className="container confirmation-container">
         <div className="confirmation-icon"><CheckCircle2 size={40} strokeWidth={2} /></div>
-        <h1>You're all booked, {firstName(state.name)}!</h1>
+        <h1>You're all booked, {firstName(booking.name)}!</h1>
         <p className="confirmation-sub">
-          {state.paid
-            ? "Your payment went through and your appointment is confirmed."
+          {booking.paid
+            ? 'Your payment went through and your appointment is confirmed.'
             : "Your appointment is confirmed — you'll pay when we arrive."}
         </p>
 
         <div className="confirmation-card">
           <div className="confirmation-row">
             <Calendar size={17} />
-            <span>{state.date}</span>
+            <span>{formatBookingDate(booking.date)}</span>
           </div>
           <div className="confirmation-row">
             <Clock size={17} />
-            <span>{formatTimeLabel(state.time)}</span>
+            <span>{booking.time}</span>
           </div>
           <div className="confirmation-row">
             <MapPin size={17} />
-            <span>{state.label}</span>
+            <span>{booking.label}</span>
           </div>
           <div className="confirmation-total">
-            <span>{state.paid ? 'Paid' : 'Total due at appointment'}</span>
-            <strong>${state.total}</strong>
+            <span>{booking.paid ? 'Paid' : 'Total due at appointment'}</span>
+            <strong>${booking.total}</strong>
           </div>
         </div>
 
         <p className="confirmation-note">
-          A confirmation has been sent to <b>{state.email}</b>. Questions or need to
+          A confirmation is on its way to <b>{booking.email}</b>. Questions or need to
           reschedule? Just give us a call.
         </p>
 
         <div className="confirmation-actions">
-          <a href="tel:+17149424780" className="btn btn-outline btn-lg">
-            <Phone size={16} /> (714) 942-4780
+          <a href={BUSINESS.phoneHref} className="btn btn-outline btn-lg">
+            <Phone size={16} /> {BUSINESS.phone}
           </a>
           <Link to="/" className="btn btn-primary btn-lg">Back to Home</Link>
         </div>
@@ -62,12 +82,4 @@ export default function Confirmation() {
 function firstName(full) {
   if (!full) return 'there'
   return full.trim().split(' ')[0]
-}
-
-function formatTimeLabel(value) {
-  if (!value) return ''
-  const [h, m] = value.split(':').map(Number)
-  const period = h < 12 ? 'AM' : 'PM'
-  const displayHour = h % 12 === 0 ? 12 : h % 12
-  return `${displayHour}:${String(m).padStart(2, '0')} ${period}`
 }

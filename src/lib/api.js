@@ -1,8 +1,8 @@
-// Thin client around the Aurum Detailing Cloudflare Worker.
-// All booking + payment state lives in D1 behind this API —
-// nothing is stored in localStorage.
+// Thin client around the Aurum Auto Detailing Cloudflare Worker (worker/worker.js).
+// All booking + payment state lives in D1 behind this API. Prices are computed by
+// the Worker from serviceId / exteriorAddOn / coupon, never taken from the browser.
 
-const API_URL = import.meta.env.VITE_API_URL || ''
+const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 
 async function request(path, options = {}) {
   const res = await fetch(`${API_URL}${path}`, {
@@ -22,12 +22,13 @@ async function request(path, options = {}) {
   return data
 }
 
-// Returns the list of already-booked time slots for a given date.
+// { date, booked: ["8:00 AM", ...] } — booked or no-longer-bookable start times.
 export function getAvailability(date) {
   return request(`/api/availability?date=${encodeURIComponent(date)}`)
 }
 
-// Creates a booking row in D1. Returns { id, ...booking }.
+// { date, time, serviceId, exteriorAddOn, name, phone, email, vehicle, address }
+// -> { id, status, service, subtotal, coupon, total }
 export function createBooking(payload) {
   return request('/api/bookings', {
     method: 'POST',
@@ -35,9 +36,7 @@ export function createBooking(payload) {
   })
 }
 
-// Creates a Stripe PaymentIntent for a booking. The Worker recalculates
-// the amount server-side from the service string — the client amount is
-// never trusted directly. Returns { clientSecret, amount }.
+// { bookingId, coupon } -> { clientSecret, amount }
 export function createPaymentIntent(payload) {
   return request('/api/create-payment-intent', {
     method: 'POST',
@@ -45,15 +44,27 @@ export function createPaymentIntent(payload) {
   })
 }
 
-// Marks a booking as paid after Stripe confirms the PaymentIntent.
-export function confirmPayment(payload) {
-  return request('/api/confirm-payment', {
+// After the card form succeeds. The Worker checks the PaymentIntent with Stripe
+// before marking the booking Paid and sending the confirmation email.
+export function markPaid(bookingId, paymentIntentId) {
+  return request(`/api/bookings/${encodeURIComponent(bookingId)}/paid`, {
     method: 'POST',
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ paymentIntentId }),
   })
 }
 
-// Validates a coupon code (currently just PREPAY for the $15 prepay offer).
+// Customer chose to pay at the appointment. Confirms the booking and sends the email.
+export function confirmPayLater(bookingId, email) {
+  return request(`/api/bookings/${encodeURIComponent(bookingId)}/confirm`, {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  })
+}
+
+// { valid, discount } — currently just PREPAY for the $15 prepay offer.
 export function validateCoupon(code) {
-  return request(`/api/coupon?code=${encodeURIComponent(code)}`)
+  return request('/api/validate-coupon', {
+    method: 'POST',
+    body: JSON.stringify({ code }),
+  })
 }
