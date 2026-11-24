@@ -26,7 +26,16 @@ export const GOOGLE_PROFILE_URL = 'https://www.google.com/search?kgmid=/g/11n3bz
 // Real Google reviews only. The Reviews section and its menu link stay hidden while
 // this list is empty. Add each one as { name: 'First L.', text: '...' } (first name +
 // last initial, typos fixed). Leave out reviews that read like a shop visit.
-export const REVIEWS = []
+// From the Google profile, Nov 2026 (all 5 stars). Rating-only reviews and the two
+// reviewers with handle names (no real name) are left out.
+export const REVIEWS = [
+  { name: 'Mari C.', text: "They did an amazing job cleaning and detailing my dad's old Chevy Tahoe. They were very communicative, were even early arriving to clean, and priced fairly. Would recommend them to anyone!" },
+  { name: 'Jeff B.', text: 'Favorite detailers in the city. Affordable prices and great work ethic.' },
+  { name: 'Roberto O.', text: 'Great service, I strongly recommend them! Fair prices!! Thanks a lot!' },
+  { name: 'Suri R.', text: "They're amazing at their job. I'll go again if I need anything." },
+  { name: 'Mitzy O.', text: "They're so good at their job." },
+  { name: 'Diabla O.', text: "They're so amazing at their job." },
+]
 
 // Home page FAQ. Shown on the page and used for the FAQPage schema, so keep both in sync.
 export const FAQS = [
