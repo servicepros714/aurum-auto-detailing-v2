@@ -21,7 +21,7 @@ export const BUSINESS = {
 }
 
 // Google Business Profile. Used in the schema (sameAs) once known. Leave '' until then.
-export const GOOGLE_PROFILE_URL = ''
+export const GOOGLE_PROFILE_URL = 'https://www.google.com/search?kgmid=/g/11n3bzk0hy&q=Aurum+Auto+Detailing'
 
 // Real Google reviews only. The Reviews section and its menu link stay hidden while
 // this list is empty. Add each one as { name: 'First L.', text: '...' } (first name +
